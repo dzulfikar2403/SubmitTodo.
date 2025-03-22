@@ -6,3 +6,4 @@ export const postTodoSchema = z.object({
   type: z.string({message: 'Expected Type'}).trim(),
   content: z.string()
 })
+

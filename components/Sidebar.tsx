@@ -1,12 +1,15 @@
 "use client";
-import { ArchiveRestore, Grip, Lightbulb, PanelLeft, PanelRight, Plus, X } from "lucide-react";
+import { ArchiveRestore, Grip, Lightbulb, LogOut, PanelLeft, PanelRight, Plus, X } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import icon from "@/app/icon.png";
 import { clsx } from "clsx";
 import Link from "next/link";
-import { postType } from "@/lib/query";
 import { usePathname } from "next/navigation";
+import { deleteCookies } from "@/lib/auth/helper";
+import { postType } from "@/lib/query";
+import { handlePostType } from "@/lib/todo/actionTodo";
+// import { handlePostType } from "@/lib/todo/actionTodo";
 
 type SidebarProps = {
   listType: {
@@ -51,7 +54,7 @@ const Sidebar = ({ listType, username }: SidebarProps) => {
             <div>
               <h3 className="font-bold">Private</h3>
 
-              <div className="overflow-y-auto max-h-80 p-1 ">
+              <div className="overflow-y-auto max-h-40 p-1 ">
                 {/* component untuk di map dari filtering db, except span all */}
                 {listType.map((el) => {
                   return (
@@ -116,6 +119,7 @@ const Sidebar = ({ listType, username }: SidebarProps) => {
                 </Link>
               </div>
             </div>
+            <button type="button" className="text-red-500 flex items-center mx-auto p-1.5 gap-1.5 shadow-md hover:rounded hover:shadow hover:bg-red-500 hover:text-white transition-all cursor-pointer" onClick={async()=> await deleteCookies()}><LogOut size={18} /> Logout</button>
           </div>
         </div>
         <div onClick={() => setIsOpen((prev) => !prev)} className="absolute -right-2 top-1/2 p-1 rounded bg-stone-200">
@@ -156,7 +160,7 @@ const Sidebar = ({ listType, username }: SidebarProps) => {
               disabled={typeValue.trim() === ""}
               className="p-1.5 border-2 border-white font-bold rounded-xl cursor-pointer transition-all bg-white disabled:opacity-50"
               onClick={async (e) => {
-                await postType(typeValue.trim() as string);
+                await handlePostType(typeValue.trim() as string);
                 setIsModalOpen(false);
                 setTypeValue("");
               }}
