@@ -46,6 +46,22 @@ export async function getAllTodo() {
   return res;
 }
 
+export async function getAllTrashTodo() {
+  const user = (await getUser()) as GetUser;
+
+  await new Promise((resolve,reject) => setTimeout(() => resolve('done'),2000) )
+  const res = await query(
+    `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
+      inner join users on todo.user_id = users.id 
+      inner join "type" on todo.type_id = type.id 
+      inner join priority on todo.priority_id = priority.id
+    where users.id = $1 and todo.is_active = false
+    order by todo.id;`,
+    [user.id]
+  );
+  return res;
+}
+
 export async function getAllTodoByType(typeName: string) {
   const user = (await getUser()) as GetUser;
   const queryTypeId = await query('select * from type where lower(type."name") = $1', [typeName]);
@@ -68,7 +84,7 @@ export async function getListTypeByUsers() {
   const user = (await getUser()) as GetUser;
 
   const res = await query(
-    `select type.id,type."name",users.id,users.username from "type" 
+    `select type.id,type."name",users.id as userId,users.username from "type" 
       inner join users on type.user_id = users.id 
     where users.id = $1`,
     [user.id]
@@ -125,6 +141,21 @@ export async function deleteTodo(todoId: number) {
 export async function restoreTodo(todoId: number) {
   const res = await query("update todo set is_active = true where id = $1", [todoId]);
 
+  // return type commandnya dan total row yang berubah
+  return { command: res?.command, rowCountChanges: res?.rowCount };
+}
+
+export async function deleteAllTrashTodoPermanent() {
+  const user = (await getUser()) as GetUser;
+  const res = await query("delete from todo where is_active = false and user_id = $1", [user.id]);
+
+  // return type commandnya dan total row yang berubah
+  return { command: res?.command, rowCountChanges: res?.rowCount };
+}
+
+export async function deleteTrashTodoPermanent(todoId:number) {
+  const res = await query("delete from todo where id = $1", [todoId]);
+  
   // return type commandnya dan total row yang berubah
   return { command: res?.command, rowCountChanges: res?.rowCount };
 }

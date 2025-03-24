@@ -7,7 +7,7 @@ import xss from "xss";
 import { GetUser, getUser } from "../auth/helper";
 import { uploadImageTodo } from "../cloudinary";
 import { revalidatePath } from "next/cache";
-import { deleteTodo, postTodo, postType, restoreTodo, updateStatusTodoFinish, updateStatusTodoProgress } from "../query";
+import { deleteAllTrashTodoPermanent, deleteTodo, deleteTrashTodoPermanent, getAllTrashTodo, postTodo, postType, restoreTodo, updateStatusTodoFinish, updateStatusTodoProgress } from "../query";
 
 export async function handlePostTodo(prev: any, formData: FormData) {
   const { id, username } = (await getUser()) as GetUser;
@@ -71,11 +71,28 @@ export async function handleUpdateTodoStatus(status: "finish" | "in progress", t
 }
 
 export async function handleDeleteTodo(todoId:number){
-  await deleteTodo(todoId);
+  const dataTrashTodo = await getAllTrashTodo();
+
+  if((dataTrashTodo?.rows as any[]).length < 20){
+    await deleteTodo(todoId);
+  }else if((dataTrashTodo?.rows as any[]).length === 20){
+    await deleteTrashTodoPermanent(todoId);
+  }
+
   revalidatePath('/',"layout")
 }
 
 export async function handleRestoreTodo(todoId:number){
   await restoreTodo(todoId);
+  revalidatePath('/',"layout")
+}
+
+export async function handleDeleteAllTrashTodo(){
+  await deleteAllTrashTodoPermanent();
+  revalidatePath('/',"layout")
+}
+
+export async function handleDeleteTrashTodoById(todoId:number){
+  await deleteTrashTodoPermanent(todoId);
   revalidatePath('/',"layout")
 }
