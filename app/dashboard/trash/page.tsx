@@ -1,8 +1,10 @@
 import BtnDeleteAllTrash from "@/components/BtnDeleteAllTrash";
 import DashboardLayout from "@/components/DashboardLayout";
+import Loading from "@/components/Loading";
 import TaskItem from "@/components/TaskItem";
 import { getAllTrashTodo } from "@/lib/query";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import React, { Suspense } from "react";
 
 export const DataTrashList = async () => {
@@ -28,7 +30,10 @@ const TrashPage = () => {
           <span>📜</span>
           <p>Your deleted items are here. Don't worry, they’re not gone yet! You can restore them if needed, or empty the trash to permanently delete them. Let's keep things tidy and organized! Maximum Trash capacity is 20 every user.</p>
         </div>
-        <Suspense fallback={'loading...'} >
+        <Link href={"/dashboard/post"} className="my-6 flex gap-2 items-center rounded-md p-2 transition-all cursor-pointer border-2 border-dashed border-slate-200 hover:bg-gray-200">
+          <Plus size={14} /> New Todo
+        </Link>
+        <Suspense fallback={<Loading />} >
           <DataTrashList />
         </Suspense>
       </main>

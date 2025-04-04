@@ -10,7 +10,7 @@ export async function middleware(req:NextRequest) {
   const user = await decrypt(token as string);
   
 
-  // cek apakah ada user dan cek apakah tidak berada di public route
+  // cek klo ngk ada user id dan cek klo lagi di private route = tendang
   if(!user?.payload.id && !publicRoute.includes(currentPath)){
     return NextResponse.redirect(new URL('/login', req.nextUrl))
   }

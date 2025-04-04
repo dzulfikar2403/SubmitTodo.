@@ -6,7 +6,6 @@ import slugify from "slugify";
 import xss from "xss";
 import { GetUser, getUser } from "../auth/helper";
 import { uploadImageTodo } from "../cloudinary";
-import { revalidatePath } from "next/cache";
 import { deleteAllTrashTodoPermanent, deleteTodo, deleteTrashTodoPermanent, getAllTrashTodo, postTodo, postType, restoreTodo, updateStatusTodoFinish, updateStatusTodoProgress } from "../query";
 
 export async function handlePostTodo(prev: any, formData: FormData) {
@@ -17,7 +16,7 @@ export async function handlePostTodo(prev: any, formData: FormData) {
     type: formData.get("type"),
     content: formData.get("content"),
   });
-
+  
   if (validationForm.error) {
     return { errors: validationForm.error?.formErrors.fieldErrors };
   }
@@ -54,20 +53,17 @@ export async function handlePostTodo(prev: any, formData: FormData) {
     priority_id: Number(priority),
   });
 
-  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
 export async function handlePostType(name: string) {
   await postType(name);
-  revalidatePath("/", "layout");
 }
 
 export async function handleUpdateTodoStatus(status: "finish" | "in progress", todoId: number) {
   if (status === "in progress") await updateStatusTodoFinish(todoId);
   if (status === "finish") await updateStatusTodoProgress(todoId);
 
-  revalidatePath("/", "layout");
 }
 
 export async function handleDeleteTodo(todoId:number){
@@ -79,20 +75,16 @@ export async function handleDeleteTodo(todoId:number){
     await deleteTrashTodoPermanent(todoId);
   }
 
-  revalidatePath('/',"layout")
 }
 
 export async function handleRestoreTodo(todoId:number){
   await restoreTodo(todoId);
-  revalidatePath('/',"layout")
 }
 
 export async function handleDeleteAllTrashTodo(){
   await deleteAllTrashTodoPermanent();
-  revalidatePath('/',"layout")
 }
 
 export async function handleDeleteTrashTodoById(todoId:number){
   await deleteTrashTodoPermanent(todoId);
-  revalidatePath('/',"layout")
 }

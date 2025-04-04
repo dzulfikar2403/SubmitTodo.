@@ -11,7 +11,6 @@ type PostFormProps = {
 
 const PostForm = ({ priorityList, typeList }: PostFormProps) => {
   const [state, action, isPending] = useActionState(handlePostTodo, null);
-  console.log(typeList);
   
   return (
     <form action={action} className=" px-4 py-8 space-y-4">

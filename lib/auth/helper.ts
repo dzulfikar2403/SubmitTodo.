@@ -3,6 +3,7 @@ import { jwtVerify, SignJWT } from "jose"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { NextResponse } from "next/server"
+import { cache } from "react"
 
 export type GetUser = {
   id: number,
@@ -41,7 +42,7 @@ export async function createCookies(dataUser:any) { //parameter dataUser, memint
   
 
   (await cookies()).set('token',token,{
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 60 * 15, //15menit
     path: '/'
@@ -62,7 +63,7 @@ export async function updateCookies(res:NextResponse){
   const validateUser = await encrypt(dataUser);
 
   res.cookies.set('token',validateUser,{
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 60 * 15, //15menit
     path: '/'
@@ -75,9 +76,9 @@ export async function deleteCookies(){
   redirect('/login')
 } 
 
-export async function getUser(){
+export const getUser = cache(async function getUser(){
   const token = (await cookies()).get('token')?.value;
   const resDecrypt = await decrypt(token as string)
-
+  
   return resDecrypt?.payload
-}
+})

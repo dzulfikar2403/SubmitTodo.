@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { GetUser, getUser } from "./auth/helper";
 import { query } from "./db";
+import { cache } from "react";
 
 export type Todo = {
   id: number;
@@ -46,10 +47,39 @@ export async function getAllTodo() {
   return res;
 }
 
+export async function getTodoById(todoSlug:string) {
+  const user = (await getUser()) as GetUser;
+
+  const res = await query(
+    `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
+      inner join users on todo.user_id = users.id 
+      inner join "type" on todo.type_id = type.id 
+      inner join priority on todo.priority_id = priority.id
+    where users.id = $1 and todo.slug = $2`,
+    [user.id,todoSlug]
+  );
+  return res;
+}
+
+export async function getAllCompletedTodo() {
+  const user = (await getUser()) as GetUser;
+
+  await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
+  const res = await query(
+    `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
+      inner join users on todo.user_id = users.id 
+      inner join "type" on todo.type_id = type.id 
+      inner join priority on todo.priority_id = priority.id
+      where users.id = $1 and todo.is_active = true and todo.status = 'finish'
+    order by todo.id;`,
+    [user.id]
+  );
+  return res;
+}
 export async function getAllTrashTodo() {
   const user = (await getUser()) as GetUser;
 
-  await new Promise((resolve,reject) => setTimeout(() => resolve('done'),2000) )
+  await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
   const res = await query(
     `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
       inner join users on todo.user_id = users.id 
@@ -80,9 +110,9 @@ export async function getAllTodoByType(typeName: string) {
   return res;
 }
 
-export async function getListTypeByUsers() {
+export const getListTypeByUsers = cache(async function getListTypeByUsers() {
   const user = (await getUser()) as GetUser;
-
+  
   const res = await query(
     `select type.id,type."name",users.id as userId,users.username from "type" 
       inner join users on type.user_id = users.id 
@@ -90,10 +120,28 @@ export async function getListTypeByUsers() {
     [user.id]
   );
   return res;
-}
+})
 
 export async function getAllPriority() {
   const res = await query("select * from priority", []);
+
+  return res;
+}
+
+export async function getPercentageCompletedByUser() {
+  await new Promise((resolve, reject) => setTimeout(() => resolve("2000"), 2000));
+  // await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
+  const res = await query(
+    `select 
+    (completed_todo_by_user::float / total_todo_by_user::float) * 100 as precentage_todo_completed
+    from (
+      select 
+        count(*) filter (where is_active = true and status = 'finish' and user_id = 1) as completed_todo_by_user,	
+        count(*) filter (where is_active = true and user_id = 1) as total_todo_by_user
+      from todo
+    );`,
+    []
+  );
 
   return res;
 }
@@ -153,9 +201,9 @@ export async function deleteAllTrashTodoPermanent() {
   return { command: res?.command, rowCountChanges: res?.rowCount };
 }
 
-export async function deleteTrashTodoPermanent(todoId:number) {
+export async function deleteTrashTodoPermanent(todoId: number) {
   const res = await query("delete from todo where id = $1", [todoId]);
-  
+
   // return type commandnya dan total row yang berubah
   return { command: res?.command, rowCountChanges: res?.rowCount };
 }
