@@ -47,7 +47,7 @@ export async function getAllTodo() {
   return res;
 }
 
-export async function getTodoById(todoSlug:string) {
+export async function getTodoById(todoId:string) {
   const user = (await getUser()) as GetUser;
 
   const res = await query(
@@ -55,8 +55,8 @@ export async function getTodoById(todoSlug:string) {
       inner join users on todo.user_id = users.id 
       inner join "type" on todo.type_id = type.id 
       inner join priority on todo.priority_id = priority.id
-    where users.id = $1 and todo.slug = $2`,
-    [user.id,todoSlug]
+    where users.id = $1 and todo.id = $2`,
+    [user.id,todoId]
   );
   return res;
 }

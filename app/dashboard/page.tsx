@@ -46,7 +46,7 @@ const DashboardPage = async () => {
           <Plus size={14} /> New Todo
         </Link>
 
-        {(getAllDataTodo?.rows as any[]).length > 0 && resultData.map((el,i) => <TaskItem key={i} title={el.typename.toLowerCase()} data={el.items} />)}
+        {(getAllDataTodo?.rows as any[]).length > 0 && resultData.map((el,i) => <TaskItem key={i} title={el.typename.toLowerCase()} data={el.items} trashLength={dataTrash?.rowCount as number ?? 0} />)}
       </main>
     </DashboardLayout>
   );

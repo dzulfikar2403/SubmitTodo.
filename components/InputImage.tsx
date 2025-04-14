@@ -1,8 +1,13 @@
 "use client";
+import { ArrowDownRight } from "lucide-react";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
 
-const InputImage = () => {
+type InputImageProps = {
+  editUI: boolean;
+};
+
+const InputImage = ({ editUI = false }: InputImageProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [listImage, setListImage] = useState<string[]>([]);
 
@@ -12,11 +17,11 @@ const InputImage = () => {
 
   const handleImageChange = (e: any) => {
     const images = e.target.files;
-    setListImage([])
+    setListImage([]);
 
     if (!images) {
-      return
-    };
+      return;
+    }
 
     for (const img of images) {
       const fileReader = new FileReader();
@@ -31,8 +36,14 @@ const InputImage = () => {
 
   return (
     <div>
-      <label htmlFor="image" className="block font-semibold">
-        Images
+      <label htmlFor="image">
+        {!editUI ? (
+          <p className="block font-semibold">Images</p>
+        ) : (
+          <p className="flex gap-1 items-center">
+            Changes <ArrowDownRight size={14} />
+          </p>
+        )}
       </label>
       <div className="flex gap-2 my-2">{listImage && listImage.map((el, i) => <Image key={i} src={el} alt={"img-" + i} width={160} height={160} className="object-center object-cover bg-white shadow-xl" />)}</div>
       <input type="file" ref={inputRef} name="image" id="image" className="hidden" onChange={handleImageChange} multiple accept="image/png, image/jpeg" />

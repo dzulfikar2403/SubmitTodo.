@@ -1,6 +1,6 @@
 import React from 'react'
 import Sidebar from './Sidebar'
-import { getListTypeByUsers } from '@/lib/query';
+import { getAllTrashTodo, getListTypeByUsers } from '@/lib/query';
 import { getUser, GetUser } from '@/lib/auth/helper';
 
 const DashboardLayout = async ({children}:{children:React.ReactNode}) => {
