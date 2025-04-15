@@ -4,7 +4,8 @@ import { getAllPriority, getListTypeByUsers, getTodoById } from "@/lib/query";
 import React from "react";
 
 const EdiPage = async ({params,searchParams}:any) => {
-  const todoId = await searchParams.todoId;
+  const awaitedTodoId = await searchParams;
+  const todoId = awaitedTodoId.todoId;
   const priorityList = await getAllPriority();
   const typeList = await getListTypeByUsers();
   const detailTodo = await getTodoById(todoId);

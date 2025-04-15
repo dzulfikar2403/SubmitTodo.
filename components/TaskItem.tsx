@@ -5,7 +5,8 @@ import { clsx } from "clsx";
 import { ChevronDown, ChevronUp, GripVertical, Pen, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
+import Loading from "./Loading";
 
 type TaskItemProps = {
   title: string;
@@ -43,7 +44,7 @@ const TaskItem = ({ title, data, staticUI = false, trashUI = false, trashLength 
   return (
     <div className="my-2">
       {/* head */}
-      <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => (!staticUI ? setIsOpen((prev) => !prev) : null)}>
+      <div className="flex items-center gap-1.5 cursor-pointer hover:bg-slate-100" onClick={() => (!staticUI ? setIsOpen((prev) => !prev) : null)}>
         {isOpen ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
         <h2 className="font-bold text-lg">{title}</h2>
         <span className="rounded px-1 text-xs bg-gray-200">{data?.length}</span>
@@ -164,7 +165,9 @@ const TaskItem = ({ title, data, staticUI = false, trashUI = false, trashLength 
             <p className="py-4 bg-stone-100 rounded px-2 inset-shadow-sm h-72 overflow-y-auto">{modalDetail.data?.content === null ? <span className="text-slate-600">content kosong</span> : modalDetail.data?.content}</p>
             <div className="flex flex-wrap gap-2 py-4">
               {modalDetail.data?.image_url ? (
-                modalDetail.data.image_url.split("|").map((img) => <Image src={img} alt={`img - ${img}`} width={75} height={75} />)
+                <>
+                {modalDetail.data.image_url.split("|").map((img,i) => <Image key={i} src={img} alt={`img - ${img}`} width={75} height={75} />)}
+                </>
               ) : (
                 <>
                   <Image src={"/images/image-placeholder.png"} alt={`img - placeholder`} width={75} height={75} title="doesn't have any photo" />

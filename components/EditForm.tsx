@@ -2,7 +2,7 @@
 import React, { useActionState } from "react";
 import InputImage from "./InputImage";
 import { ArrowDownRight, TrendingUp } from "lucide-react";
-import { handlePostTodo } from "@/lib/todo/actionTodo";
+import { handleUpdateTodo } from "@/lib/todo/actionTodo";
 import { Todo } from "@/lib/query";
 import Image from "next/image";
 
@@ -13,10 +13,11 @@ type EditFormProps = {
 };
 
 const EditForm = ({ priorityList, typeList, dataTodo }: EditFormProps) => {
-  const [state, action, isPending] = useActionState(handlePostTodo, null);
+  const [state, action, isPending] = useActionState(handleUpdateTodo, null);
 
   return (
     <form action={action} className=" px-4 py-8 space-y-4">
+      <input type="hidden" name="id" value={dataTodo.id} />
       <div className="flex items-center gap-12">
         <div>
           <label htmlFor="title" className="block font-semibold">
