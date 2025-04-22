@@ -41,11 +41,11 @@ const InputImage = ({ editUI = false }: InputImageProps) => {
           <p className="block font-semibold">Images</p>
         ) : (
           <p className="flex gap-1 items-center">
-            Changes <ArrowDownRight size={14} />
+            Changes (must fill) <ArrowDownRight size={14} /> 
           </p>
         )}
       </label>
-      <div className="flex gap-2 my-2">{listImage && listImage.map((el, i) => <Image key={i} src={el} alt={"img-" + i} width={160} height={160} className="object-center object-cover bg-white shadow-xl" />)}</div>
+      <div className="flex flex-wrap gap-2 my-2">{listImage.length > 0 ? listImage.map((el, i) => <Image key={i} src={el} alt={"img-" + i} width={160} height={160} className="object-center object-cover bg-white shadow-xl" />) : <p className="text-sm text-gray-500">Previous Image Will be Removed,<br /> if you want the image same with the image before, choose image again.</p> }</div>
       <input type="file" ref={inputRef} name="image" id="image" className="hidden" onChange={handleImageChange} multiple accept="image/png, image/jpeg" />
       <button type="button" onClick={handleInputRef} className="px-2 py-1 my-1 text-gray-500 bg-gray-50 border-2 border-black transition-all hover:bg-gray-200">
         Choose Images

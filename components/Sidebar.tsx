@@ -104,6 +104,17 @@ const Sidebar = ({ listType, username }: SidebarProps) => {
                   </div>
                 </Link>
                 <Link
+                  href={"/dashboard/uncompleted"}
+                  className={clsx("group flex items-center justify-between cursor-pointer my-2 p-2 rounded hover:bg-gray-200 transition-all", {
+                    "bg-gray-200": pathname === `/dashboard/uncompleted`,
+                  })}
+                >
+                  <div className="flex items-center gap-1">
+                    <Grip size={12} />
+                    <p>📚 Uncompleted</p>
+                  </div>
+                </Link>
+                <Link
                   href={"/dashboard/trash"}
                   className={clsx("group flex items-center justify-between cursor-pointer my-2 p-2 rounded hover:bg-gray-200 transition-all", {
                     "bg-gray-200": pathname === `/dashboard/trash`,
@@ -119,7 +130,7 @@ const Sidebar = ({ listType, username }: SidebarProps) => {
                 </Link>
               </div>
             </div>
-            <button type="button" className="text-red-500 flex items-center mx-auto p-1.5 gap-1.5 shadow-md hover:rounded hover:shadow hover:bg-red-500 hover:text-white transition-all cursor-pointer" onClick={async()=> await deleteCookies()}><LogOut size={18} /> Logout</button>
+            <button type="button" className=" flex items-center mx-auto p-1.5 gap-1.5 shadow-md rounded hover:shadow-lg bg-red-500 text-white transition-all cursor-pointer" onClick={async()=> await deleteCookies()}><LogOut size={18} /> Logout</button>
           </div>
         </div>
         <div onClick={() => setIsOpen((prev) => !prev)} className="absolute -right-2 top-1/2 p-1 rounded bg-stone-200">

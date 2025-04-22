@@ -47,7 +47,7 @@ export async function getAllTodo() {
   return res;
 }
 
-export async function getTodoById(todoId:string) {
+export async function getTodoById(todoId: string) {
   const user = (await getUser()) as GetUser;
 
   const res = await query(
@@ -56,7 +56,7 @@ export async function getTodoById(todoId:string) {
       inner join "type" on todo.type_id = type.id 
       inner join priority on todo.priority_id = priority.id
     where users.id = $1 and todo.id = $2`,
-    [user.id,todoId]
+    [user.id, todoId]
   );
   return res;
 }
@@ -64,7 +64,6 @@ export async function getTodoById(todoId:string) {
 export async function getAllCompletedTodo() {
   const user = (await getUser()) as GetUser;
 
-  await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
   const res = await query(
     `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
       inner join users on todo.user_id = users.id 
@@ -76,10 +75,29 @@ export async function getAllCompletedTodo() {
   );
   return res;
 }
+
+export async function getAllUncompletedTodo() {
+  const user = (await getUser()) as GetUser;
+
+  const res = await query(
+    `select 	todo.*,
+              users.username,
+              type."name" as typename,
+              priority.priority_level 
+    from todo
+    inner join users on todo.user_id = users.id 
+    inner join "type" on todo.type_id = type.id 
+    inner join priority on todo.priority_id = priority.id
+    where users.id = $1 and todo.is_active = true and todo.status = 'in progress'
+    order by todo.id;`,
+    [user.id]
+  );
+  return res;
+}
+
 export async function getAllTrashTodo() {
   const user = (await getUser()) as GetUser;
 
-  await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
   const res = await query(
     `select todo.*,users.username,type."name" as typename,priority.priority_level from todo
       inner join users on todo.user_id = users.id 
@@ -112,7 +130,7 @@ export async function getAllTodoByType(typeName: string) {
 
 export const getListTypeByUsers = cache(async function getListTypeByUsers() {
   const user = (await getUser()) as GetUser;
-  
+
   const res = await query(
     `select type.id,type."name",users.id as userId,users.username from "type" 
       inner join users on type.user_id = users.id 
@@ -120,7 +138,7 @@ export const getListTypeByUsers = cache(async function getListTypeByUsers() {
     [user.id]
   );
   return res;
-})
+});
 
 export async function getAllPriority() {
   const res = await query("select * from priority", []);
@@ -129,18 +147,35 @@ export async function getAllPriority() {
 }
 
 export async function getPercentageCompletedByUser() {
-  await new Promise((resolve, reject) => setTimeout(() => resolve("2000"), 2000));
-  // await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
+  const user = await getUser() as GetUser;
   const res = await query(
     `select 
     (completed_todo_by_user::float / total_todo_by_user::float) * 100 as precentage_todo_completed
     from (
       select 
-        count(*) filter (where is_active = true and status = 'finish' and user_id = 1) as completed_todo_by_user,	
-        count(*) filter (where is_active = true and user_id = 1) as total_todo_by_user
+        count(*) filter (where is_active = true and status = 'finish' and user_id = $1) as completed_todo_by_user,	
+        count(*) filter (where is_active = true and user_id = $1) as total_todo_by_user
       from todo
     );`,
-    []
+    [user.id]
+  );
+
+  return res;
+}
+
+export async function getPercentageUncompletedByUser() {
+  const user = await getUser() as GetUser;
+  // await new Promise((resolve, reject) => setTimeout(() => resolve("done"), 2000));
+  const res = await query(
+    `select 
+      (uncompleted_todo_by_user::float / total_todo_by_user::float) * 100 as precentage_todo_uncompleted
+      from (
+        select 
+          count(*) filter (where is_active = true and status = 'in progress' and user_id = $1) as uncompleted_todo_by_user,	
+          count(*) filter (where is_active = true and user_id = $1) as total_todo_by_user
+        from todo
+      );`,
+    [user.id]
   );
 
   return res;

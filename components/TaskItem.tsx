@@ -13,7 +13,7 @@ type TaskItemProps = {
   data?: Todo[];
   staticUI?: boolean;
   trashUI?: boolean;
-  trashLength: number | string;
+  trashLength?: number | string;
 };
 
 type modalDetailType = {
@@ -76,20 +76,20 @@ const TaskItem = ({ title, data, staticUI = false, trashUI = false, trashLength 
             <div className="flex items-center gap-1.5 px-4">
               <div
                 className={clsx("py-0.5 px-2 rounded border-2 text-sm first-letter:uppercase", {
-                  "text-emerald-600 bg-emerald-100": el.status === "in progress",
-                  "text-emerald-100 bg-emerald-600": el.status === "finish",
-                })}
-              >
-                {el.status}
-              </div>
-              <div
-                className={clsx("py-0.5 px-2 rounded border-2 text-sm first-letter:uppercase", {
                   "text-indigo-600 bg-indigo-100": el.priority_level === "urgent",
                   "text-orange-600 bg-orange-100": el.priority_level === "high",
                   "text-sky-600 bg-sky-100": el.priority_level === "normal",
                 })}
               >
                 {el.priority_level}
+              </div>
+              <div
+                className={clsx("py-0.5 px-2 rounded border-2 text-sm first-letter:uppercase", {
+                  "text-emerald-600 bg-emerald-100": el.status === "in progress",
+                  "text-emerald-100 bg-emerald-600": el.status === "finish",
+                })}
+              >
+                {el.status}
               </div>
               <GripVertical id={el.id.toString()} size={20} className="cursor-pointer" onClick={(e) => handleOverlayDelete(e.currentTarget.id)} />
             </div>
@@ -166,7 +166,9 @@ const TaskItem = ({ title, data, staticUI = false, trashUI = false, trashLength 
             <div className="flex flex-wrap gap-2 py-4">
               {modalDetail.data?.image_url ? (
                 <>
-                {modalDetail.data.image_url.split("|").map((img,i) => <Image key={i} src={img} alt={`img - ${img}`} width={75} height={75} />)}
+                  {modalDetail.data.image_url.split("|").map((img, i) => (
+                    <Image key={i} src={img} alt={`img - ${img}`} width={75} height={75} />
+                  ))}
                 </>
               ) : (
                 <>
